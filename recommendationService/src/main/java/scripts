@@ -1,0 +1,132 @@
+-- Invest 500
+/*Пользователь использует как минимум один продукт с типом DEBIT.
+Пользователь не использует продукты с типом INVEST.
+Сумма пополнений продуктов с типом SAVING больше 1000 ₽*/
+
+SELECT DISTINCT u.*
+FROM users u
+INNER JOIN transactions t
+ON t.user_id = u.id
+INNER JOIN products p
+ON p.id = t.product_id
+WHERE
+u.id IN (
+SELECT t.user_id
+FROM transactions t
+INNER JOIN products p
+ON p.id = t.product_id
+WHERE p.type = 'DEBIT')
+AND u.id NOT IN (
+SELECT t.user_id
+FROM transactions t
+INNER JOIN products p
+ON p.id = t.product_id
+WHERE
+p.type = 'INVEST')
+AND u.id IN (
+SELECT t.user_id
+FROM transactions t
+INNER JOIN products p
+ON p.id = t.product_id
+AND t.type = 'DEPOSIT'
+AND p.type = 'SAVING'
+GROUP BY t.user_id
+HAVING SUM (Amount) > 1000)
+
+-- Top Saving
+/*Пользователь использует как минимум один продукт с типом DEBIT.
+Сумма пополнений по всем продуктам типа DEBIT больше или равна 50 000 ₽
+ИЛИ Сумма пополнений по всем продуктам типа SAVING больше или равна 50 000 ₽.
+Сумма пополнений по всем продуктам типа DEBIT больше, чем сумма трат по всем продуктам типа DEBIT.*/
+SELECT u.id
+FROM users u
+WHERE
+    EXISTS (
+        SELECT 1
+        FROM transactions t
+        INNER JOIN products p ON p.id = t.product_id
+        WHERE t.user_id = u.id AND p.type = 'DEBIT'
+    )
+    AND (
+        (
+            SELECT COALESCE(SUM(t2.Amount), 0)
+            FROM transactions t2
+            INNER JOIN products p2 ON p2.id = t2.product_id
+            WHERE t2.user_id = u.id AND p2.type = 'DEBIT' AND t2.type = 'WITHDRAW'
+        ) >= 50000
+        OR
+        (
+            SELECT COALESCE(SUM(t3.Amount), 0)
+            FROM transactions t3
+            INNER JOIN products p3 ON p3.id = t3.product_id
+            WHERE t3.user_id = u.id AND p3.type = 'SAVING' AND t3.type = 'WITHDRAW'
+        ) >= 50000
+    )
+    AND
+    (
+        SELECT COALESCE(SUM(t4.Amount), 0)
+        FROM transactions t4
+        INNER JOIN products p4 ON p4.id = t4.product_id
+        WHERE t4.user_id = u.id AND p4.type = 'DEBIT' AND t4.type = 'DEPOSIT'
+    ) > (
+        SELECT COALESCE(SUM(t5.Amount), 0)
+        FROM transactions t5
+        INNER JOIN products p5 ON p5.id = t5.product_id
+        WHERE t5.user_id = u.id AND p5.type='DEBIT' AND t5.type='WITHDRAW'
+    );
+
+-- Простой кредит
+/*Пользователь не использует продукты с типом CREDIT.
+Сумма пополнений по всем продуктам типа DEBIT больше, чем сумма трат по всем продуктам типа DEBIT.
+Сумма трат по всем продуктам типа DEBIT больше, чем 100 000 ₽*/
+
+SELECT DISTINCT u.*
+FROM users u
+INNER JOIN transactions t
+ON t.user_id = u.id
+INNER JOIN products p
+ON p.id = t.product_id
+INNER JOIN(
+SELECT
+deposit.user_id
+FROM
+(SELECT
+SUM (Amount) AS sum_deposit,
+t.user_id
+FROM transactions t
+INNER JOIN products p
+ON p.id = t.product_id
+AND t.type = 'DEPOSIT'
+AND p.type ='DEBIT'
+GROUP BY t.user_id) AS deposit
+INNER JOIN
+(SELECT
+SUM (Amount) AS sum_withdraw,
+t.user_id
+FROM transactions t
+INNER JOIN products p
+ON p.id = t.product_id
+AND t.type = 'WITHDRAW'
+AND p.type ='DEBIT'
+GROUP BY t.user_id) AS withdraw
+ON deposit.user_id = withdraw.user_id
+GROUP BY deposit.user_id
+HAVING (sum_deposit - sum_withdraw) > 0) cte
+ON cte.user_id = t.user_id
+WHERE
+u.id NOT IN (
+SELECT t.user_id
+FROM transactions t
+INNER JOIN products p
+ON p.id = t.product_id
+WHERE
+p.type = 'CREDIT')
+AND u.id IN (
+SELECT t.user_id
+FROM transactions t
+INNER JOIN products p
+ON p.id = t.product_id
+AND t.type = 'WITHDRAW'
+AND p.type = 'DEBIT'
+GROUP BY t.user_id
+HAVING SUM (Amount) > 100000)
