@@ -2,7 +2,7 @@ package org.skypro.recommendationService.controller;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import org.skypro.recommendationService.dto.RecommendationDto;
-import org.skypro.recommendationService.dto.RecommendationResponse;
+import org.skypro.recommendationService.model.RecommendationResponse;
 import org.skypro.recommendationService.service.RecommendationService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
