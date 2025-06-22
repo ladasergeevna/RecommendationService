@@ -2,6 +2,10 @@ package org.skypro.recommendationService.dto;
 
 import java.util.UUID;
 
+/**
+ * DTO-класс для представления одной рекомендации.
+ * Содержит идентификатор, название и текст рекомендации.
+ */
 public class RecommendationDto {
     private UUID id;
     private String name;

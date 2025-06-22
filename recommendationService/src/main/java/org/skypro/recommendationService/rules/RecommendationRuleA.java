@@ -8,6 +8,11 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Правило A для рекомендаций.
+ * Условие: пользователь использует только дебетовые продукты, не инвестирует, и имеет накопления свыше 1000.
+ * Если условие выполняется — выдается рекомендация на ИИС.
+ */
 @Component
 public class RecommendationRuleA implements RecommendationRuleSet {
 
@@ -16,7 +21,6 @@ public class RecommendationRuleA implements RecommendationRuleSet {
     public RecommendationRuleA(RecommendationsRepository recommendationsRepository) {
         this.recommendationsRepository = recommendationsRepository;
     }
-
 
     public Optional<RecommendationDto> getRecommendation(UUID userId) {
         boolean conditionMet = recommendationsRepository.checkUserConditionsA(userId);

@@ -7,6 +7,11 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Правило B для рекомендаций.
+ * Условие: пользователь активно использует дебетовые продукты, делает крупные снятия, но при этом накапливает больше, чем тратит.
+ * Если условие выполняется — предлагается продукт «Копилка».
+ */
 @Component
 public class RecommendationRuleB implements RecommendationRuleSet {
     private final RecommendationsRepository recommendationsRepository;
@@ -14,7 +19,6 @@ public class RecommendationRuleB implements RecommendationRuleSet {
     public RecommendationRuleB(RecommendationsRepository recommendationsRepository) {
         this.recommendationsRepository = recommendationsRepository;
     }
-
 
     @Override
     public Optional<RecommendationDto> getRecommendation(UUID userId) {
