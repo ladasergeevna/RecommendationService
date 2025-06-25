@@ -8,6 +8,11 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Правило C для рекомендаций.
+ * Условие: пользователь не пользуется кредитами, имеет положительное сальдо и снятия на сумму более 100 000.
+ * Если условие выполняется — предлагается кредитный продукт.
+ */
 @Component
 public class RecommendationRuleC implements RecommendationRuleSet {
 
