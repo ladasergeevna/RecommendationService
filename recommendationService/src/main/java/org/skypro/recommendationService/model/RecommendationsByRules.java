@@ -18,6 +18,10 @@ public class RecommendationsByRules {
     @Column(name = "product_text")
     private String productText;
 
+    @OneToMany(mappedBy = "recommendation",
+            cascade = CascadeType.ALL)
+    private List<Rule> rule;
+
     public RecommendationsByRules(UUID productId, String productName, String productText) {
         this.productId = productId;
         this.productName = productName;
@@ -30,10 +34,6 @@ public class RecommendationsByRules {
 
     public RecommendationsByRules() {
     }
-
-    @OneToMany(mappedBy = "recommendation",
-                cascade = CascadeType.ALL)
-        private List<Rule> rule;
 
 
         public UUID getProductId () {

@@ -2,7 +2,10 @@ package org.skypro.recommendationService.controller;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import org.skypro.recommendationService.dto.RecommendationDto;
+import org.skypro.recommendationService.model.DepositTransactions;
 import org.skypro.recommendationService.model.RecommendationResponse;
+import org.skypro.recommendationService.model.User;
+import org.skypro.recommendationService.model.WithdrawTransaction;
 import org.skypro.recommendationService.service.RecommendationService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -33,5 +36,15 @@ public class RecommendationController {
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(response);
+    }
+
+    @GetMapping(path = "/deposit/{userId}")
+    public DepositTransactions getDepById(@PathVariable("userId") String id){
+        return recommendationService.getDepAmountById(id);
+    }
+
+    @GetMapping(path = "/withdraw/{userId}")
+    public WithdrawTransaction getWithById(@PathVariable("userId") String id){
+        return recommendationService.getWithAmountById(id);
     }
 }

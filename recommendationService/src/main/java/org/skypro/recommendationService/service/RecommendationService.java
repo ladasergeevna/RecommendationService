@@ -1,6 +1,11 @@
 package org.skypro.recommendationService.service;
 
+import org.skypro.recommendationService.component.RecommendationSetOfRules;
 import org.skypro.recommendationService.dto.RecommendationDto;
+import org.skypro.recommendationService.model.DepositTransactions;
+import org.skypro.recommendationService.model.User;
+import org.skypro.recommendationService.model.WithdrawTransaction;
+import org.skypro.recommendationService.repository.RecommendationsRepository;
 import org.skypro.recommendationService.rules.RecommendationRuleSet;
 import org.springframework.stereotype.Service;
 
@@ -13,8 +18,13 @@ import java.util.UUID;
 public class RecommendationService {
     private final List<RecommendationRuleSet> ruleSets;
 
-    public RecommendationService(List<RecommendationRuleSet> ruleSets) {
+    private RecommendationSetOfRules recommendationSetOfRules;
+
+    private final RecommendationsRepository recommendationsRepository;
+
+    public RecommendationService(List<RecommendationRuleSet> ruleSets, RecommendationsRepository recommendationsRepository) {
         this.ruleSets = ruleSets;
+        this.recommendationsRepository = recommendationsRepository;
     }
 
     public List<RecommendationDto> getRecommendations(UUID userId) {
@@ -26,5 +36,15 @@ public class RecommendationService {
         }
 
         return recommendations;
+    }
+
+    public DepositTransactions getDepAmountById(String userId){
+
+        return recommendationsRepository.getDepositAmountByUserId(userId);
+    }
+
+    public WithdrawTransaction getWithAmountById(String userId){
+
+        return recommendationsRepository.getWithdrawAmountByUserId(userId);
     }
 }

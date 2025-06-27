@@ -36,30 +36,29 @@ public class RecommendationSetOfRules {
         WithdrawTransaction withdrawTransactions = recommendationsRepository.getWithdrawAmountByUserId(userId);
 
         //Filling deposit Map
-        depositMap.put("DEBIT", depositTransactions.getDebit_amount());
-        depositMap.put("SAVING", depositTransactions.getSaving_amount());
-        depositMap.put("CREDIT", depositTransactions.getCredit_amount());
-        depositMap.put("INVEST", depositTransactions.getInvest_amount());
+        depositMap.put("DEBIT", depositTransactions.getDebitAmount());
+        depositMap.put("SAVING", depositTransactions.getSavingAmount());
+        depositMap.put("CREDIT", depositTransactions.getCreditAmount());
+        depositMap.put("INVEST", depositTransactions.getInvestAmount());
 
         //Filling withdraw Map
-        withdrawMap.put("DEBIT", withdrawTransactions.getDebit_amount());
-        withdrawMap.put("SAVING", withdrawTransactions.getSaving_amount());
-        withdrawMap.put("CREDIT", withdrawTransactions.getCredit_amount());
-        withdrawMap.put("INVEST", withdrawTransactions.getInvest_amount());
+        withdrawMap.put("DEBIT", withdrawTransactions.getDebitAmount());
+        withdrawMap.put("SAVING", withdrawTransactions.getSavingAmount());
+        withdrawMap.put("CREDIT", withdrawTransactions.getCreditAmount());
+        withdrawMap.put("INVEST", withdrawTransactions.getInvestAmount());
 
         List<RecommendationsByRules> listOfRecs = new ArrayList<>();
 
         List<RecommendationsByRules> allRecs = recommendationsByRuleRepository.findAll();
         UUID uuid = UUID.fromString(userId);
 
-
-        int timeBefore = LocalTime.now().getNano();
         allRecs.parallelStream().forEach(recommendationsByRules -> {
             List<Rule> rulesList = ruleRepository.findByRecommendationProductId(recommendationsByRules.getProductId());
 
-            if (checkAllQuerys(userId, rulesList, depositMap, withdrawMap)){listOfRecs.add(recommendationsByRules);}
+            if (checkAllQuerys(userId, rulesList, depositMap, withdrawMap)) {
+                listOfRecs.add(recommendationsByRules);
+            }
         });
-        int timeAfter = LocalTime.now().getNano();
 
         return listOfRecs;
     }

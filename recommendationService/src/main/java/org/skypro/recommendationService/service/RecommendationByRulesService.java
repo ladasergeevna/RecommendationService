@@ -31,13 +31,13 @@ public class RecommendationByRulesService {
     }
 
     //Создание
-    public RecommendationsByRules saveRecByRule(RecommendationRuleDto recomDto){
+    public RecommendationsByRules saveRecByRule(RecommendationRuleDto recomrecommendationRuleDto){
 
         RecommendationsByRules recommendation = new RecommendationsByRules();
-        recommendation.setProductName(recomDto.getProduct_name());
-        recommendation.setProductText(recomDto.getProduct_text());
+        recommendation.setProductName(recomrecommendationRuleDto.getProduct_name());
+        recommendation.setProductText(recomrecommendationRuleDto.getProduct_text());
         List<Rule> rules = new ArrayList<>();
-        for (RuleDto ruleDto : recomDto.getRule()) {
+        for (RuleDto ruleDto : recomrecommendationRuleDto.getRule()) {
             Rule rule = new Rule(ruleDto.getQuery(), ruleDto.getArguments(), ruleDto.isNegate(), recommendation);
             rules.add(rule);}
 
