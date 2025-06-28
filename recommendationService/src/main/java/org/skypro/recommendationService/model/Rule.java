@@ -4,18 +4,24 @@ import jakarta.persistence.*;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 @Entity
-@Table (name = "rules")
+@Table(name = "rules")
 public class Rule {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID id;
 
     @Column(name = "query")
     private String query;
-    @Column(name = "arguments")
+
+    @ElementCollection
+    @CollectionTable(name = "rule_arguments", joinColumns = @JoinColumn(name = "rule_id"))
+    @Column(name = "argument")
     private List<String> arguments;
+
     @Column(name = "negate")
     private boolean negate;
 
@@ -23,11 +29,22 @@ public class Rule {
     @JoinColumn(name = "productId")
     private RecommendationsByRules recommendation;
 
+    public Rule() {
+    }
+
     public Rule(String query, List<String> arguments, boolean negate, RecommendationsByRules recommendation) {
         this.query = query;
         this.arguments = arguments;
         this.negate = negate;
         this.recommendation = recommendation;
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
     }
 
     public String getQuery() {
@@ -49,13 +66,13 @@ public class Rule {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof Rule)) return false;
         Rule rule = (Rule) o;
-        return Objects.equals(id, rule.id);
+        return id != null && id.equals(rule.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(id);
+        return 31;
     }
 }

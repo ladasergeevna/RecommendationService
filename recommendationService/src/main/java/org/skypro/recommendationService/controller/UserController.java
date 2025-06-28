@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -22,14 +24,14 @@ public class UserController {
 
     //User with withdraw transaction
     @GetMapping(path = "/withdraws/{id}")
-    public ResponseEntity<UserWithdraw> getWithdrawOfUser(@PathVariable("id") String id){
+    public ResponseEntity<UserWithdraw> getWithdrawOfUser(@PathVariable("id") UUID id){
         if (userService.getWithdraws(id) == null){return ResponseEntity.notFound().build();}
         return ResponseEntity.ok(userService.getWithdraws(id));
     }
 
     //User with deposit transaction
     @GetMapping(path = "/deposits/{id}")
-    public ResponseEntity<UserDeposit> getDepositOfUser(@PathVariable("id") String id){
+    public ResponseEntity<UserDeposit> getDepositOfUser(@PathVariable("id") UUID id){
         if (userService.getDeposits(id) == null){return ResponseEntity.notFound().build();}
         return ResponseEntity.ok(userService.getDeposits(id));
     }

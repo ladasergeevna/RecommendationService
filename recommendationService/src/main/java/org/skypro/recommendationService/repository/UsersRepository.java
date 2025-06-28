@@ -17,7 +17,7 @@ public class UsersRepository {
     }
 
     // Метод для получения информации о пользователе из таблицы users_withdraw
-    public UserWithdraw getUserWithdrawInfo(String id) {
+    public UserWithdraw getUserWithdrawInfo(UUID id) {
 
         return jdbcTemplate.queryForObject(
                 "SELECT user_id, debit_amount, saving_amount, credit_amount, invest_amount FROM users_withdraws WHERE user_id = ?",
@@ -32,7 +32,7 @@ public class UsersRepository {
 
     // Метод для получения информации о пользователе из таблицы users_deposit
 
-    public UserDeposit getUserDepositInfo(String id) {
+    public UserDeposit getUserDepositInfo(UUID id) {
         return jdbcTemplate.queryForObject(
                 "SELECT user_id, debit_amount, saving_amount, credit_amount, invest_amount FROM users_deposits WHERE user_id = ?",
                 (rs, rowNum) -> new UserDeposit(

@@ -25,7 +25,7 @@ public class RecommendationRuleController {
     }
 
     @GetMapping(path = "/user/{userId}")
-    public ResponseEntity<List<RecommendationsByRules>> getRecForUser(@PathVariable("userId") String userId){
+    public ResponseEntity<List<RecommendationsByRules>> getRecForUser(@PathVariable("userId") UUID userId){
         List<RecommendationsByRules> recsList = recsByRulesService.selectRecommendation(userId);
 
         if (recsList == null){return ResponseEntity.notFound().build();}

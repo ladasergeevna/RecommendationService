@@ -4,7 +4,10 @@ import org.skypro.recommendationService.model.UserDeposit;
 import org.skypro.recommendationService.model.UserWithdraw;
 import org.skypro.recommendationService.repository.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -12,13 +15,15 @@ public class UserService {
     @Autowired
     private UsersRepository usersRepository;
 
-    //User with withdraw transaction
-    public UserWithdraw getWithdraws(String id) {
+    @Cacheable(value = "withdrawAmount", key = "#id")
+    public UserWithdraw getWithdraws(UUID id) {
         return usersRepository.getUserWithdrawInfo(id);
     }
 
-    //User with deposit transaction
-    public UserDeposit getDeposits(String id) {
+    @Cacheable(value = "depositAmount", key = "#id")
+    public UserDeposit getDeposits(UUID id) {
         return usersRepository.getUserDepositInfo(id);
     }
 }
+
+

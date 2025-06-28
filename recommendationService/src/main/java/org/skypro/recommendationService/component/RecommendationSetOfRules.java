@@ -10,7 +10,6 @@ import org.skypro.recommendationService.repository.RuleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalTime;
 import java.util.*;
 
 @Component
@@ -26,7 +25,7 @@ public class RecommendationSetOfRules {
     private RecommendationsByRuleRepository recommendationsByRuleRepository;
 
     //главный метод, проверяет все методы-чекеры и подбирает подходящую рекоммендацию
-    public List<RecommendationsByRules> recommendationSelection(String userId) {
+    public List<RecommendationsByRules> recommendationSelection(UUID userId) {
         List<Rule> ruleOfList = ruleRepository.findAll();
 
         Map<String, Integer> depositMap = new HashMap<>();
@@ -50,7 +49,6 @@ public class RecommendationSetOfRules {
         List<RecommendationsByRules> listOfRecs = new ArrayList<>();
 
         List<RecommendationsByRules> allRecs = recommendationsByRuleRepository.findAll();
-        UUID uuid = UUID.fromString(userId);
 
         allRecs.parallelStream().forEach(recommendationsByRules -> {
             List<Rule> rulesList = ruleRepository.findByRecommendationProductId(recommendationsByRules.getProductId());
@@ -65,7 +63,7 @@ public class RecommendationSetOfRules {
 
 
     //United method-checker for different querys
-    public boolean checkAllQuerys(String userId, List<Rule> rulesList,
+    public boolean checkAllQuerys(UUID userId, List<Rule> rulesList,
                                   Map<String, Integer> depositMap, Map<String, Integer> withdrawMap) {
         boolean flag5 = false, greateFlag = false;
         List<Integer> listForCheckTrueCount = new ArrayList<>();
@@ -140,7 +138,7 @@ public class RecommendationSetOfRules {
     }
 
     //ACTIVE_USER_OF
-    public boolean activeUserOfCheck(String userId, List<String> arguments, boolean negate) {
+    public boolean activeUserOfCheck(UUID userId, List<String> arguments, boolean negate) {
         boolean flag2 = false;
 
 

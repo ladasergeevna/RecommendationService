@@ -25,45 +25,55 @@ public class RecommendationByRulesService {
     @Autowired
     private RecommendationSetOfRules recommendationSetOfRules;
 
-    //получение рекоммендаций для пользователей
-    public List<RecommendationsByRules> selectRecommendation(String userId){
+    // получение рекоммендаций для пользователей
+    public List<RecommendationsByRules> selectRecommendation(UUID userId) {
         return recommendationSetOfRules.recommendationSelection(userId);
     }
 
-    //Создание
-    public RecommendationsByRules saveRecByRule(RecommendationRuleDto recomrecommendationRuleDto){
-
+    // создание новой рекомендации с динамическими правилами
+    public RecommendationsByRules saveRecByRule(RecommendationRuleDto dto) {
         RecommendationsByRules recommendation = new RecommendationsByRules();
-        recommendation.setProductName(recomrecommendationRuleDto.getProduct_name());
-        recommendation.setProductText(recomrecommendationRuleDto.getProduct_text());
+        recommendation.setProductName(dto.getProduct_name());
+        recommendation.setProductText(dto.getProduct_text());
+
         List<Rule> rules = new ArrayList<>();
-        for (RuleDto ruleDto : recomrecommendationRuleDto.getRule()) {
-            Rule rule = new Rule(ruleDto.getQuery(), ruleDto.getArguments(), ruleDto.isNegate(), recommendation);
-            rules.add(rule);}
+        for (RuleDto ruleDto : dto.getRule()) {
+            rules.add(new Rule(ruleDto.getQuery(), ruleDto.getArguments(), ruleDto.isNegate(), null));
+        }
 
-        List<Rule> sortedRuleList = sortRules(rules);
-        recommendation.setRule(sortedRuleList);
+        List<Rule> sortedRules = sortRules(rules);
+        recommendation.setRule(sortedRules);
 
+        for (Rule rule : sortedRules) {
+            rule.setRecommendation(recommendation);
+        }
 
-        if (rules.size() != 3){return null;}
-        return recommendationsByRulesRepository.save(recommendation);
+        if (sortedRules.size() != 3) return null;
+
+        try {
+            return recommendationsByRulesRepository.save(recommendation);
+        } catch (Exception e) {
+            System.err.println("❌ Error saving recommendation: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
     }
 
-    public List<RecommendationsByRules> getAllRecsByRule(){
+    public List<RecommendationsByRules> getAllRecsByRule() {
         return recommendationsByRulesRepository.findAll();
     }
 
-    public void deleteRules(){
+    public void deleteRules() {
         int rulesSize = ruleRepository.findAll().size();
         int recommendationsSize = recommendationsByRulesRepository.findAll().size();
 
-        if ((rulesSize + recommendationsSize) != 0){
+        if ((rulesSize + recommendationsSize) != 0) {
             ruleRepository.deleteAll();
             recommendationsByRulesRepository.deleteAll();
         }
     }
 
-    //удаление рекомендаций и правил по продукту
+    // удаление рекомендаций и правил по продукту
     @Transactional
     public void deleteRecommendationByProductId(UUID productId) {
         Optional<RecommendationsByRules> recommendationOpt = recommendationsByRulesRepository.findById(productId);
@@ -77,7 +87,7 @@ public class RecommendationByRulesService {
         }
     }
 
-    //Сортировка правил по querys: USER_OF -> ACTIVE_USER_OF ->  TRANSACTION_SUM_COMPARE -> TRANSACTION_SUM_COMPARE_DEPOSIT_WITHDRAW
+    // сортировка правил по логике
     private List<Rule> sortRules(List<Rule> ruleList) {
         List<String> order = Arrays.asList(
                 "USER_OF",
@@ -87,7 +97,6 @@ public class RecommendationByRulesService {
         );
 
         ruleList.sort(Comparator.comparingInt(rule -> order.indexOf(rule.getQuery())));
-
         return ruleList;
     }
 }

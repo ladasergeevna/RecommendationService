@@ -2,9 +2,8 @@
 -- changeset formatted sryazanova:2
 
 CREATE TABLE rules(
-    Id UUID,
+    id UUID PRIMARY KEY,
     query TEXT,
-    arguments TEXT,
-    negate boolean,
+    negate BOOLEAN,
     product_id UUID
 );

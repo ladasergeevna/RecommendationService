@@ -1,10 +1,16 @@
 package org.skypro.recommendationService.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.List;
 
 public class RecommendationRuleDto {
+    @JsonProperty("productName")
     private String product_name;
+
+    @JsonProperty("productText")
     private String product_text;
+
     private List<RuleDto> rule;
 
     public RecommendationRuleDto(String product_name, String product_text, List<RuleDto> rule) {
@@ -12,6 +18,8 @@ public class RecommendationRuleDto {
         this.product_text = product_text;
         this.rule = rule;
     }
+
+    public RecommendationRuleDto() {}
 
     public List<RuleDto> getRule() {
         return rule;

@@ -1,31 +1,27 @@
 package org.skypro.recommendationService.configuration;
 
-import com.zaxxer.hikari.HikariDataSource;
+import jakarta.persistence.EntityManagerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
+import org.springframework.context.annotation.*;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.orm.jpa.*;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
+import java.util.HashMap;
 
 @Configuration
 public class RecommendationsDataSourceConfiguration {
-    @Bean(name = "recommendationsDataSource")
-    public DataSource recommendationsDataSource(@Value("${application.recommendations-db.url}") String recommendationsUrl) {
-        var dataSource = new HikariDataSource();
-        dataSource.setJdbcUrl(recommendationsUrl);
-        dataSource.setDriverClassName("org.h2.Driver");
-        dataSource.setReadOnly(true);
-        return dataSource;
-    }
+
     @Bean(name = "recommendationsJdbcTemplate")
-    public JdbcTemplate recommendationsJdbcTemplate(
-            @Qualifier("recommendationsDataSource") DataSource dataSource
-    ) {
-        return new JdbcTemplate(dataSource);
+    public JdbcTemplate recommendationsJdbcTemplate(DataSource defaultDataSource) {
+        return new JdbcTemplate(defaultDataSource);
     }
 
     @Primary

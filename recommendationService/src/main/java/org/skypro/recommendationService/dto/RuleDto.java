@@ -15,6 +15,10 @@ public class RuleDto {
         this.negate = negate;
     }
 
+    public RuleDto() {
+    }
+
+
     public String getQuery() {
         return query;
     }

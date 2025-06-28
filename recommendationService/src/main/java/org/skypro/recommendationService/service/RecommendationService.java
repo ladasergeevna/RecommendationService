@@ -38,12 +38,12 @@ public class RecommendationService {
         return recommendations;
     }
 
-    public DepositTransactions getDepAmountById(String userId){
+    public DepositTransactions getDepAmountById(UUID userId){
 
         return recommendationsRepository.getDepositAmountByUserId(userId);
     }
 
-    public WithdrawTransaction getWithAmountById(String userId){
+    public WithdrawTransaction getWithAmountById(UUID userId){
 
         return recommendationsRepository.getWithdrawAmountByUserId(userId);
     }

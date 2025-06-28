@@ -39,12 +39,12 @@ public class RecommendationController {
     }
 
     @GetMapping(path = "/deposit/{userId}")
-    public DepositTransactions getDepById(@PathVariable("userId") String id){
+    public DepositTransactions getDepById(@PathVariable("userId") UUID id){
         return recommendationService.getDepAmountById(id);
     }
 
     @GetMapping(path = "/withdraw/{userId}")
-    public WithdrawTransaction getWithById(@PathVariable("userId") String id){
+    public WithdrawTransaction getWithById(@PathVariable("userId") UUID id){
         return recommendationService.getWithAmountById(id);
     }
 }

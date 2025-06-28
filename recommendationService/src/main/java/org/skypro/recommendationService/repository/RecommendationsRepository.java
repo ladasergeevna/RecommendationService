@@ -91,7 +91,7 @@ public boolean checkUserConditionsC(UUID userId) {
     return count != null && count > 0;
 }
 
-    public int getCountTransactionsByProductName(String userId, String product){
+    public int getCountTransactionsByProductName(UUID userId, String product){
         String script = "SELECT COUNT(t.product_id) " +
                 "FROM transactions t " +
                 "JOIN products p ON t.product_id = p.id " +
@@ -103,7 +103,7 @@ public boolean checkUserConditionsC(UUID userId) {
     }
 
     @Cacheable(cacheNames = {"depositAmount"},  key = "{#userId}")
-    public DepositTransactions getDepositAmountByUserId(String userId) {
+    public DepositTransactions getDepositAmountByUserId(UUID userId) {
 
         String script = "SELECT " +
                 "SUM(CASE WHEN p.type = 'DEBIT' AND t.type = 'DEPOSIT' THEN t.amount ELSE 0 END) AS debit_amount, " +
@@ -125,7 +125,7 @@ public boolean checkUserConditionsC(UUID userId) {
     }
 
     @Cacheable(cacheNames = {"withdrawAmount"},  key = "{#userId}")
-    public WithdrawTransaction getWithdrawAmountByUserId(String userId) {
+    public WithdrawTransaction getWithdrawAmountByUserId(UUID userId) {
         String script = "SELECT " +
                 "SUM(CASE WHEN p.type = 'DEBIT' AND t.type = 'WITHDRAW' THEN t.amount ELSE 0 END) AS debit_amount, " +
                 "SUM(CASE WHEN p.type = 'SAVING' AND t.type = 'WITHDRAW' THEN t.amount ELSE 0 END) AS saving_amount, " +

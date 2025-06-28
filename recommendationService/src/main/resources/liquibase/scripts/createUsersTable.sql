@@ -17,9 +17,10 @@ CREATE TABLE users_withdraws (
     invest_amount DECIMAL(10,2)
 );
 
-create table transactions(
-id SERIAL PRIMARY KEY,
+CREATE TABLE transactions(
+    id SERIAL PRIMARY KEY,
     type TEXT,
     user_id UUID,
-    product_id UUID
-)
+    product_id UUID,
+    amount DECIMAL(10,2)  -- ✅ Add this line
+);
