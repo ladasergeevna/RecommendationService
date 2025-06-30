@@ -33,8 +33,8 @@ public class RecommendationByRulesService {
     // создание новой рекомендации с динамическими правилами
     public RecommendationsByRules saveRecByRule(RecommendationRuleDto dto) {
         RecommendationsByRules recommendation = new RecommendationsByRules();
-        recommendation.setProductName(dto.getProduct_name());
-        recommendation.setProductText(dto.getProduct_text());
+        recommendation.setProductName(dto.getProductName());
+        recommendation.setProductText(dto.getProductText());
 
         List<Rule> rules = new ArrayList<>();
         for (RuleDto ruleDto : dto.getRule()) {

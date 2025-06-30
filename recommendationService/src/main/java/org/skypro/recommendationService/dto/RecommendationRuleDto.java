@@ -6,16 +6,16 @@ import java.util.List;
 
 public class RecommendationRuleDto {
     @JsonProperty("productName")
-    private String product_name;
+    private String productName;
 
     @JsonProperty("productText")
-    private String product_text;
+    private String productText;
 
     private List<RuleDto> rule;
 
-    public RecommendationRuleDto(String product_name, String product_text, List<RuleDto> rule) {
-        this.product_name = product_name;
-        this.product_text = product_text;
+    public RecommendationRuleDto(String productName, String productText, List<RuleDto> rule) {
+        this.productName = productName;
+        this.productText = productText;
         this.rule = rule;
     }
 
@@ -29,27 +29,27 @@ public class RecommendationRuleDto {
         this.rule = rule;
     }
 
-    public String getProduct_text() {
-        return product_text;
+    public String getProductText() {
+        return productText;
     }
 
-    public void setProduct_text(String product_text) {
-        this.product_text = product_text;
+    public void setProductText(String productText) {
+        this.productText = productText;
     }
 
-    public String getProduct_name() {
-        return product_name;
+    public String getProductName() {
+        return productName;
     }
 
-    public void setProduct_name(String product_name) {
-        this.product_name = product_name;
+    public void setProductName(String productName) {
+        this.productName = productName;
     }
 
     @Override
     public String toString() {
         return "RecommendationRuleDto{" +
-                "product_name='" + product_name + '\'' +
-                ", product_text='" + product_text + '\'' +
+                "product_name='" + productName + '\'' +
+                ", product_text='" + productText + '\'' +
                 ", rule=" + rule +
                 '}';
     }

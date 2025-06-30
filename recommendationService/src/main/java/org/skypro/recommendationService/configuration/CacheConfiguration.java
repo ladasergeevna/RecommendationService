@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 @Configuration
 @EnableCaching
-public class CachConfiguration {
+public class CacheConfiguration {
     @Bean
     public CacheManager cacheManager(){
         CaffeineCacheManager cacheManager = new CaffeineCacheManager("depositAmount", "withdrawAmount");
