@@ -2,9 +2,7 @@ package org.skypro.recommendationService.controller;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.skypro.recommendationService.dto.RecommendationDto;
-import org.skypro.recommendationService.dto.RecommendationResponse;
 import org.skypro.recommendationService.service.RecommendationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
