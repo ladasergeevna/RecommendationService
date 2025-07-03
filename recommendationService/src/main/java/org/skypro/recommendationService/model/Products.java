@@ -9,6 +9,9 @@ public class Products {
         this.description = description;
     }
 
+    public Products() {
+    }
+
     public String getName() {
         return name;
     }

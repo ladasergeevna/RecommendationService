@@ -30,7 +30,11 @@ public class RecommendationsByRules {
             return productId;
         }
 
-        public String getProductName () {
+    public void setProductId(UUID productId) {
+        this.productId = productId;
+    }
+
+    public String getProductName () {
             return productName;
         }
 
