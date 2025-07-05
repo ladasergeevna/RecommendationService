@@ -9,6 +9,7 @@ import org.skypro.recommendationService.model.WithdrawTransaction;
 import org.skypro.recommendationService.repository.RecommendationsByRuleRepository;
 import org.skypro.recommendationService.repository.RecommendationsRepository;
 import org.skypro.recommendationService.repository.RuleRepository;
+import org.skypro.recommendationService.service.RuleStatisticsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -25,6 +26,8 @@ public class RecommendationSetOfRules {
 
     @Autowired
     private RecommendationsByRuleRepository recommendationsByRuleRepository;
+    @Autowired
+    private RuleStatisticsService ruleStatisticsService;
 
     public List<RecommendationsByRules> recommendationSelection(UUID userId) {
         List<Rule> allRules = ruleRepository.findAll();
@@ -80,30 +83,37 @@ public class RecommendationSetOfRules {
         if (rule1.getQuery().equals(RuleQueryType.USER_OF.name())) {
             currentCheckPassed = userOfCheck(rule1.getArguments(), rule1.isNegate(), depositMap, withdrawMap);
             if (currentCheckPassed) passedChecks.add(1);
+            ruleStatisticsService.incrementRuleCount(rule1.getId());
             rulesCheckedCount++;
         } else if (rule1.getQuery().equals(RuleQueryType.ACTIVE_USER_OF.name())) {
             currentCheckPassed = activeUserOfCheck(userId, rule1.getArguments(), rule1.isNegate());
             if (currentCheckPassed) passedChecks.add(1);
             rulesCheckedCount++;
+            // Инкремент счетчика для этого правила
+            ruleStatisticsService.incrementRuleCount(rule1.getId());
         }
 
         if (rule2.getQuery().equals(RuleQueryType.ACTIVE_USER_OF.name())) {
             currentCheckPassed = activeUserOfCheck(userId, rule2.getArguments(), rule2.isNegate());
             if (currentCheckPassed) passedChecks.add(1);
+            ruleStatisticsService.incrementRuleCount(rule2.getId());
             rulesCheckedCount++;
         } else if (rule2.getQuery().equals(RuleQueryType.TRANSACTION_SUM_COMPARE.name())) {
             currentCheckPassed = transactionSumCompareCheck(rule2.getArguments(), rule2.isNegate(), depositMap, withdrawMap);
             if (currentCheckPassed) passedChecks.add(1);
+            ruleStatisticsService.incrementRuleCount(rule2.getId());
             rulesCheckedCount++;
         }
 
         if (rule3.getQuery().equals(RuleQueryType.TRANSACTION_SUM_COMPARE.name())) {
             currentCheckPassed = transactionSumCompareCheck(rule3.getArguments(), rule3.isNegate(), depositMap, withdrawMap);
             if (currentCheckPassed) passedChecks.add(1);
+            ruleStatisticsService.incrementRuleCount(rule3.getId());
             rulesCheckedCount++;
         } else if (rule3.getQuery().equals(RuleQueryType.TRANSACTION_SUM_COMPARE_DEPOSIT_WITHDRAW.name())) {
             currentCheckPassed = compareTransactionsByProduct(rule3.getArguments(), rule3.isNegate(), depositMap, withdrawMap);
             if (currentCheckPassed) passedChecks.add(1);
+            ruleStatisticsService.incrementRuleCount(rule3.getId());
             rulesCheckedCount++;
         }
 
