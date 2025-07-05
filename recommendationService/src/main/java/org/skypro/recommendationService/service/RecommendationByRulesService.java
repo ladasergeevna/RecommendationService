@@ -2,12 +2,14 @@ package org.skypro.recommendationService.service;
 
 import jakarta.transaction.Transactional;
 import org.skypro.recommendationService.component.RecommendationSetOfRules;
+import org.skypro.recommendationService.component.RuleStats;
 import org.skypro.recommendationService.dto.RecommendationRuleDto;
 import org.skypro.recommendationService.dto.RuleDto;
 import org.skypro.recommendationService.model.RecommendationsByRules;
 import org.skypro.recommendationService.model.Rule;
 import org.skypro.recommendationService.repository.RecommendationsByRuleRepository;
 import org.skypro.recommendationService.repository.RuleRepository;
+import org.skypro.recommendationService.repository.RuleStatisticsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +26,10 @@ public class RecommendationByRulesService {
 
     @Autowired
     private RecommendationSetOfRules recommendationSetOfRules;
+    @Autowired
+    private RuleStatisticsService ruleStatisticsService;
+    @Autowired
+    private RuleStatisticsRepository ruleStatisticsRepository;
 
     // получение рекоммендаций для пользователей
     public List<RecommendationsByRules> selectRecommendation(UUID userId) {
@@ -46,6 +52,11 @@ public class RecommendationByRulesService {
 
         for (Rule rule : sortedRules) {
             rule.setRecommendation(recommendation);
+            // Инициализация счетчика в 0, если еще не существует
+            if (!ruleStatisticsRepository.existsById(rule.getId())) {
+                RuleStats rs = new RuleStats(rule.getId());
+                ruleStatisticsRepository.save(rs);
+            }
         }
 
         if (sortedRules.size() != 3) return null;
@@ -81,6 +92,7 @@ public class RecommendationByRulesService {
         if (recommendationOpt.isPresent()) {
             RecommendationsByRules recommendation = recommendationOpt.get();
             for (Rule rule : recommendation.getRule()) {
+                ruleStatisticsService.resetRuleCounter(rule.getId()); // Обнуляем счетчик статистики срабатывания правила
                 ruleRepository.delete(rule);
             }
             recommendationsByRulesRepository.delete(recommendation);
