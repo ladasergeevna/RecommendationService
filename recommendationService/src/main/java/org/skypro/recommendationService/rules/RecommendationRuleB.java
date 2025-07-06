@@ -6,7 +6,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 import java.util.UUID;
-
+/**
+ * Реализация правила Top Saving
+ */
 @Component
 public class RecommendationRuleB implements RecommendationRuleSet {
     private final RecommendationsRepository recommendationsRepository;
@@ -15,7 +17,12 @@ public class RecommendationRuleB implements RecommendationRuleSet {
         this.recommendationsRepository = recommendationsRepository;
     }
 
-
+    /**
+     * Получает рекомендацию для пользователя на основе выполненных условий.
+     *
+     * @param userId UUID пользователя.
+     * @return Optional содержащий RecommendationDto, если условия выполнены; иначе Optional.empty().
+     */
     @Override
     public Optional<RecommendationDto> getRecommendation(UUID userId) {
         boolean conditionMet = recommendationsRepository.checkUserConditionsB(userId);

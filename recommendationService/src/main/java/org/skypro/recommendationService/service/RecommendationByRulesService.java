@@ -2,17 +2,21 @@ package org.skypro.recommendationService.service;
 
 import jakarta.transaction.Transactional;
 import org.skypro.recommendationService.component.RecommendationSetOfRules;
+import org.skypro.recommendationService.component.RuleStats;
 import org.skypro.recommendationService.dto.RecommendationRuleDto;
 import org.skypro.recommendationService.dto.RuleDto;
 import org.skypro.recommendationService.model.RecommendationsByRules;
 import org.skypro.recommendationService.model.Rule;
 import org.skypro.recommendationService.repository.RecommendationsByRuleRepository;
 import org.skypro.recommendationService.repository.RuleRepository;
+import org.skypro.recommendationService.repository.RuleStatisticsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-
+/**
+ * Сервис для работы с рекомендациями на основе динамических правил.
+ */
 @Service
 public class RecommendationByRulesService {
 
@@ -24,13 +28,21 @@ public class RecommendationByRulesService {
 
     @Autowired
     private RecommendationSetOfRules recommendationSetOfRules;
+    @Autowired
+    private RuleStatisticsService ruleStatisticsService;
+    @Autowired
+    private RuleStatisticsRepository ruleStatisticsRepository;
 
-    // получение рекоммендаций для пользователей
     public List<RecommendationsByRules> selectRecommendation(UUID userId) {
         return recommendationSetOfRules.recommendationSelection(userId);
     }
 
-    // создание новой рекомендации с динамическими правилами
+    /**
+     * Создает и сохраняет новую рекомендацию на основе переданного DTO.
+     *
+     * @param dto DTO с данными для создания рекомендации.
+     * @return созданная рекомендация, или null, если не удалось сохранить.
+     */
     public RecommendationsByRules saveRecByRule(RecommendationRuleDto dto) {
         RecommendationsByRules recommendation = new RecommendationsByRules();
         recommendation.setProductName(dto.getProductName());
@@ -46,6 +58,10 @@ public class RecommendationByRulesService {
 
         for (Rule rule : sortedRules) {
             rule.setRecommendation(recommendation);
+            if (!ruleStatisticsRepository.existsById(rule.getId())) {
+                RuleStats rs = new RuleStats(rule.getId());
+                ruleStatisticsRepository.save(rs);
+            }
         }
 
         if (sortedRules.size() != 3) return null;
@@ -59,10 +75,18 @@ public class RecommendationByRulesService {
         }
     }
 
+    /**
+     * Получает все рекомендации, сохраненные в базе данных.
+     *
+     * @return список всех рекомендаций.
+     */
     public List<RecommendationsByRules> getAllRecsByRule() {
         return recommendationsByRulesRepository.findAll();
     }
 
+    /**
+     * Удаляет все правила и рекомендации из базы данных.
+     */
     public void deleteRules() {
         int rulesSize = ruleRepository.findAll().size();
         int recommendationsSize = recommendationsByRulesRepository.findAll().size();
@@ -73,7 +97,11 @@ public class RecommendationByRulesService {
         }
     }
 
-    // удаление рекомендаций и правил по продукту
+    /**
+     * Удаляет рекомендацию по ID продукта и связанные с ней правила.
+     *
+     * @param productId UUID продукта, рекомендации которого нужно удалить.
+     */
     @Transactional
     public void deleteRecommendationByProductId(UUID productId) {
         Optional<RecommendationsByRules> recommendationOpt = recommendationsByRulesRepository.findById(productId);
@@ -81,13 +109,19 @@ public class RecommendationByRulesService {
         if (recommendationOpt.isPresent()) {
             RecommendationsByRules recommendation = recommendationOpt.get();
             for (Rule rule : recommendation.getRule()) {
+                ruleStatisticsService.resetRuleCounter(rule.getId());
                 ruleRepository.delete(rule);
             }
             recommendationsByRulesRepository.delete(recommendation);
         }
     }
 
-    // сортировка правил по логике
+    /**
+     * Сортирует список правил.
+     *
+     * @param ruleList список правил для сортировки.
+     * @return отсортированный список правил.
+     */
     private List<Rule> sortRules(List<Rule> ruleList) {
         List<String> order = Arrays.asList(
                 "USER_OF",

@@ -7,7 +7,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.UUID;
-
+/**
+ * Репозиторий для работы с данными пользователей в базе данных.
+ */
 @Repository
 public class UsersRepository {
     private final JdbcTemplate jdbcTemplate;
@@ -16,7 +18,12 @@ public class UsersRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    // Метод для получения информации о пользователе из таблицы users_withdraw
+    /**
+     * Получает информацию о пользователе из таблицы users_withdraws по его ID.
+     *
+     * @param id UUID пользователя.
+     * @return объект UserWithdraw с данными о выводах пользователя.
+     */
     public UserWithdraw getUserWithdrawInfo(UUID id) {
 
         return jdbcTemplate.queryForObject(
@@ -30,7 +37,12 @@ public class UsersRepository {
                 id);
     }
 
-    // Метод для получения информации о пользователе из таблицы users_deposit
+    /**
+     * Получает информацию о пользователе из таблицы users_deposits по его ID.
+     *
+     * @param id UUID пользователя.
+     * @return объект UserDeposit с данными о депозитах пользователя.
+     */
 
     public UserDeposit getUserDepositInfo(UUID id) {
         return jdbcTemplate.queryForObject(
