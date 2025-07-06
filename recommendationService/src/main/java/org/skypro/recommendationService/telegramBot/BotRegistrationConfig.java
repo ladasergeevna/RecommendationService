@@ -4,7 +4,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
-
+/**
+ * Конфигурационный класс для регистрации Telegram-бота.
+ */
 @Configuration
 public class BotRegistrationConfig {
 
@@ -15,6 +17,10 @@ public class BotRegistrationConfig {
         registerBot();
     }
 
+    /**
+     * Метод для регистрации бота в Telegram API.
+     * Выполняется при создании экземпляра класса.
+     */
     private void registerBot() {
         try {
             TelegramBotsApi api = new TelegramBotsApi(DefaultBotSession.class);

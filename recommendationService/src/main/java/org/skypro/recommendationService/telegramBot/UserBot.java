@@ -33,7 +33,6 @@ public class UserBot {
 
     }
 
-
     public UUID getUserId() {
         return userId;
     }

@@ -13,7 +13,9 @@ import org.telegram.telegrambots.meta.generics.TelegramBot;
 
 import java.util.List;
 import java.util.UUID;
-
+/**
+ * Реализация Телеграм-бота для обработки команд и отправки рекомендаций пользователям.
+ */
 @Component
 public class RecommendationTelegramBot extends TelegramLongPollingBot {
 
@@ -41,6 +43,11 @@ public class RecommendationTelegramBot extends TelegramLongPollingBot {
         return properties.getToken();
     }
 
+    /**
+     * Обрабатывает входящие обновления (сообщения).
+     *
+     * @param update входящее обновление от Telegram.
+     */
     @Override
     public void onUpdateReceived(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
@@ -59,7 +66,12 @@ public class RecommendationTelegramBot extends TelegramLongPollingBot {
         } System.out.println("Received update: " + update);
     }
 
-
+    /**
+     * Обрабатывает команду /recommend и отправляет рекомендации пользователю.
+     *
+     * @param chatId идентификатор чата.
+     * @param messageText текст команды.
+     */
 
     private void handleRecommendCommand(Long chatId, String messageText) {
         String[] parts = messageText.split("\\s+");
@@ -95,7 +107,12 @@ public class RecommendationTelegramBot extends TelegramLongPollingBot {
                 + recommendationsText.toString();
         sendMessage(chatId, responseText);
     }
-
+    /**
+     * Отправляет сообщение в чат по его идентификатору.
+     *
+     * @param chatId идентификатор чата.
+     * @param text текст сообщения.
+     */
     private void sendMessage(Long chatId, String text) {
         SendMessage message = new SendMessage();
         message.setChatId(chatId.toString());

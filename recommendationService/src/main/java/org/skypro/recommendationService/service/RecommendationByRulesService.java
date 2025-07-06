@@ -14,7 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-
+/**
+ * Сервис для работы с рекомендациями на основе динамических правил.
+ */
 @Service
 public class RecommendationByRulesService {
 
@@ -31,12 +33,16 @@ public class RecommendationByRulesService {
     @Autowired
     private RuleStatisticsRepository ruleStatisticsRepository;
 
-    // получение рекоммендаций для пользователей
     public List<RecommendationsByRules> selectRecommendation(UUID userId) {
         return recommendationSetOfRules.recommendationSelection(userId);
     }
 
-    // создание новой рекомендации с динамическими правилами
+    /**
+     * Создает и сохраняет новую рекомендацию на основе переданного DTO.
+     *
+     * @param dto DTO с данными для создания рекомендации.
+     * @return созданная рекомендация, или null, если не удалось сохранить.
+     */
     public RecommendationsByRules saveRecByRule(RecommendationRuleDto dto) {
         RecommendationsByRules recommendation = new RecommendationsByRules();
         recommendation.setProductName(dto.getProductName());
@@ -52,7 +58,6 @@ public class RecommendationByRulesService {
 
         for (Rule rule : sortedRules) {
             rule.setRecommendation(recommendation);
-            // Инициализация счетчика в 0, если еще не существует
             if (!ruleStatisticsRepository.existsById(rule.getId())) {
                 RuleStats rs = new RuleStats(rule.getId());
                 ruleStatisticsRepository.save(rs);
@@ -70,10 +75,18 @@ public class RecommendationByRulesService {
         }
     }
 
+    /**
+     * Получает все рекомендации, сохраненные в базе данных.
+     *
+     * @return список всех рекомендаций.
+     */
     public List<RecommendationsByRules> getAllRecsByRule() {
         return recommendationsByRulesRepository.findAll();
     }
 
+    /**
+     * Удаляет все правила и рекомендации из базы данных.
+     */
     public void deleteRules() {
         int rulesSize = ruleRepository.findAll().size();
         int recommendationsSize = recommendationsByRulesRepository.findAll().size();
@@ -84,7 +97,11 @@ public class RecommendationByRulesService {
         }
     }
 
-    // удаление рекомендаций и правил по продукту
+    /**
+     * Удаляет рекомендацию по ID продукта и связанные с ней правила.
+     *
+     * @param productId UUID продукта, рекомендации которого нужно удалить.
+     */
     @Transactional
     public void deleteRecommendationByProductId(UUID productId) {
         Optional<RecommendationsByRules> recommendationOpt = recommendationsByRulesRepository.findById(productId);
@@ -92,14 +109,19 @@ public class RecommendationByRulesService {
         if (recommendationOpt.isPresent()) {
             RecommendationsByRules recommendation = recommendationOpt.get();
             for (Rule rule : recommendation.getRule()) {
-                ruleStatisticsService.resetRuleCounter(rule.getId()); // Обнуляем счетчик статистики срабатывания правила
+                ruleStatisticsService.resetRuleCounter(rule.getId());
                 ruleRepository.delete(rule);
             }
             recommendationsByRulesRepository.delete(recommendation);
         }
     }
 
-    // сортировка правил по логике
+    /**
+     * Сортирует список правил.
+     *
+     * @param ruleList список правил для сортировки.
+     * @return отсортированный список правил.
+     */
     private List<Rule> sortRules(List<Rule> ruleList) {
         List<String> order = Arrays.asList(
                 "USER_OF",

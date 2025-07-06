@@ -8,6 +8,9 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Реализация правила Простой кредит
+ */
 @Component
 public class RecommendationRuleC implements RecommendationRuleSet {
 
@@ -17,7 +20,12 @@ public class RecommendationRuleC implements RecommendationRuleSet {
         this.recommendationsRepository = recommendationsRepository;
     }
 
-
+    /**
+     * Получает рекомендацию для пользователя на основе выполненных условий.
+     *
+     * @param userId UUID пользователя.
+     * @return Optional содержащий RecommendationDto, если условия выполнены; иначе Optional.empty().
+     */
     public Optional<RecommendationDto> getRecommendation(UUID userId) {
         boolean conditionMet = recommendationsRepository.checkUserConditionsC(userId);
         if (conditionMet) {

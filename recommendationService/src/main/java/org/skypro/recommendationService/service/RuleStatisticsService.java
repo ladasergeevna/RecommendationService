@@ -8,25 +8,40 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Сервис для сбора статистики о частоте срабатывания правил
+ */
 @Service
 public class RuleStatisticsService {
 
     @Autowired
     private RuleStatisticsRepository ruleStatisticsRepository;
 
-    // Получить статистику по всем правилам
+    /**
+     * Получает список всех статистических данных по правилам.
+     *
+     * @return список объектов RuleStats, содержащих статистику по каждому правилу.
+     */
     public List<RuleStats> getAllStats() {
         return ruleStatisticsRepository.findAll();
     }
 
-    // Инкрементировать счетчик по правилу
+    /**
+     * Увеличивает счетчик срабатываний правила.
+     *
+     * @param ruleId UUID правила, для которого нужно увеличить счетчик.
+     */
     public void incrementRuleCount(UUID ruleId) {
         RuleStats stats = ruleStatisticsRepository.findById(ruleId).orElseGet(() -> new RuleStats(ruleId));
         stats.increment();
         ruleStatisticsRepository.save(stats);
     }
 
-    // Обнулить счетчик по правилу (при удалении)
+    /**
+     * Обнуляет счетчика срабатываний правила.
+     *
+     * @param ruleId UUID правила, для которого нужно сбросить счетчик.
+     */
     public void resetRuleCounter(UUID ruleId) {
         if (ruleStatisticsRepository.existsById(ruleId)) {
             RuleStats stats = ruleStatisticsRepository.findById(ruleId).get();
