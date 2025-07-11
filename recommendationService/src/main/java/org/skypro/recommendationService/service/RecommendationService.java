@@ -14,7 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
+/**
+ * Сервис для получения рекомендаций и связанных с ними данных.
+ */
 @Service
 public class RecommendationService {
     private final List<RecommendationRuleSet> ruleSets;
@@ -29,6 +31,12 @@ public class RecommendationService {
         this.recommendationsRepository = recommendationsRepository;
     }
 
+    /**
+     * Получает список рекомендаций для пользователя по его ID.
+     *
+     * @param userId UUID идентификатора пользователя.
+     * @return список рекомендаций, соответствующих пользователю.
+     */
     public List<RecommendationDto> getRecommendations(UUID userId) {
         List<RecommendationDto> recommendations = new ArrayList<>();
 
@@ -40,11 +48,23 @@ public class RecommendationService {
         return recommendations;
     }
 
+    /**
+     * Получает информацию о депозитных транзакциях пользователя по его ID.
+     *
+     * @param userId UUID идентификатора пользователя.
+     * @return объект DepositTransactions с информацией о сумме депозитов.
+     */
     public DepositTransactions getDepAmountById(UUID userId){
 
         return recommendationsRepository.getDepositAmountByUserId(userId);
     }
 
+    /**
+     * Получает сумму снятий транзакций пользователя по его ID.
+     *
+     * @param userId UUID идентификатора пользователя.
+     * @return объект WithdrawTransaction с информацией о сумме снятий.
+     */
     public WithdrawTransaction getWithAmountById(UUID userId){
 
         return recommendationsRepository.getWithdrawAmountByUserId(userId);

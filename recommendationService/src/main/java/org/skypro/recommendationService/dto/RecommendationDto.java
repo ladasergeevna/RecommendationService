@@ -16,6 +16,9 @@ public class RecommendationDto {
     public RecommendationDto() {
     }
 
+    public RecommendationDto(String s) {
+    }
+
     public UUID getId() {
         return id;
     }

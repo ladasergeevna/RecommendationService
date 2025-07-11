@@ -22,5 +22,5 @@ CREATE TABLE transactions(
     type TEXT,
     user_id UUID,
     product_id UUID,
-    amount DECIMAL(10,2)
+    amount DECIMAL(10,2)  -- ✅ Add this line
 );

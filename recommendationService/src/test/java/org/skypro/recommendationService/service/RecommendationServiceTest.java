@@ -120,5 +120,3 @@ public class RecommendationServiceTest {
         assertNull(actualResult);
     }
 }
-
-

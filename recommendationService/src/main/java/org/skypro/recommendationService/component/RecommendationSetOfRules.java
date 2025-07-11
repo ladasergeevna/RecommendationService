@@ -9,11 +9,14 @@ import org.skypro.recommendationService.model.WithdrawTransaction;
 import org.skypro.recommendationService.repository.RecommendationsByRuleRepository;
 import org.skypro.recommendationService.repository.RecommendationsRepository;
 import org.skypro.recommendationService.repository.RuleRepository;
+import org.skypro.recommendationService.service.RuleStatisticsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
-
+/**
+ * Компонент, реализующий логику рекомендаций на основе набора правил.
+ */
 @Component
 public class RecommendationSetOfRules {
 
@@ -25,7 +28,15 @@ public class RecommendationSetOfRules {
 
     @Autowired
     private RecommendationsByRuleRepository recommendationsByRuleRepository;
+    @Autowired
+    private RuleStatisticsService ruleStatisticsService;
 
+    /**
+     * Получает список рекомендаций для пользователя по его ID.
+     *
+     * @param userId UUID идентификатора пользователя.
+     * @return список рекомендаций matchedRecommendations.
+     */
     public List<RecommendationsByRules> recommendationSelection(UUID userId) {
         List<Rule> allRules = ruleRepository.findAll();
 
@@ -66,6 +77,15 @@ public class RecommendationSetOfRules {
         return matchedRecommendations;
     }
 
+    /**
+     * Проверяет, соответствуют ли все правила заданному пользователю и транзакциям.
+     *
+     * @param userId      UUID пользователя.
+     * @param rulesList   список правил для проверки.
+     * @param depositMap  Map с поступлениями.
+     * @param withdrawMap Map со снятиями.
+     * @return true, если все правила выполнены; иначе false.
+     */
     public boolean allRulesMatch(UUID userId, List<Rule> rulesList,
                                  Map<String, Integer> depositMap, Map<String, Integer> withdrawMap) {
         boolean currentCheckPassed;
@@ -80,30 +100,37 @@ public class RecommendationSetOfRules {
         if (rule1.getQuery().equals(RuleQueryType.USER_OF.name())) {
             currentCheckPassed = userOfCheck(rule1.getArguments(), rule1.isNegate(), depositMap, withdrawMap);
             if (currentCheckPassed) passedChecks.add(1);
+            ruleStatisticsService.incrementRuleCount(rule1.getId());
             rulesCheckedCount++;
         } else if (rule1.getQuery().equals(RuleQueryType.ACTIVE_USER_OF.name())) {
             currentCheckPassed = activeUserOfCheck(userId, rule1.getArguments(), rule1.isNegate());
             if (currentCheckPassed) passedChecks.add(1);
             rulesCheckedCount++;
+            // Инкремент счетчика для этого правила
+            ruleStatisticsService.incrementRuleCount(rule1.getId());
         }
 
         if (rule2.getQuery().equals(RuleQueryType.ACTIVE_USER_OF.name())) {
             currentCheckPassed = activeUserOfCheck(userId, rule2.getArguments(), rule2.isNegate());
             if (currentCheckPassed) passedChecks.add(1);
+            ruleStatisticsService.incrementRuleCount(rule2.getId());
             rulesCheckedCount++;
         } else if (rule2.getQuery().equals(RuleQueryType.TRANSACTION_SUM_COMPARE.name())) {
             currentCheckPassed = transactionSumCompareCheck(rule2.getArguments(), rule2.isNegate(), depositMap, withdrawMap);
             if (currentCheckPassed) passedChecks.add(1);
+            ruleStatisticsService.incrementRuleCount(rule2.getId());
             rulesCheckedCount++;
         }
 
         if (rule3.getQuery().equals(RuleQueryType.TRANSACTION_SUM_COMPARE.name())) {
             currentCheckPassed = transactionSumCompareCheck(rule3.getArguments(), rule3.isNegate(), depositMap, withdrawMap);
             if (currentCheckPassed) passedChecks.add(1);
+            ruleStatisticsService.incrementRuleCount(rule3.getId());
             rulesCheckedCount++;
         } else if (rule3.getQuery().equals(RuleQueryType.TRANSACTION_SUM_COMPARE_DEPOSIT_WITHDRAW.name())) {
             currentCheckPassed = compareTransactionsByProduct(rule3.getArguments(), rule3.isNegate(), depositMap, withdrawMap);
             if (currentCheckPassed) passedChecks.add(1);
+            ruleStatisticsService.incrementRuleCount(rule3.getId());
             rulesCheckedCount++;
         }
 
@@ -114,16 +141,44 @@ public class RecommendationSetOfRules {
         return allChecksPassed;
     }
 
+    /**
+     * Проверяет условие "Пользователь с определенным аргументом".
+     *
+     * @param arguments список аргументов (например, название продукта).
+     * @param negate    флаг отрицания условия.
+     * @param depositMap  Map с поступлениями.
+     * @param withdrawMap Map со снятиями.
+     * @return true, если условие выполнено; иначе false.
+     */
+
     public boolean userOfCheck(List<String> arguments, boolean negate,
                                Map<String, Integer> depositMap, Map<String, Integer> withdrawMap) {
         int totalAmount = depositMap.get(arguments.get(0)) + withdrawMap.get(arguments.get(0));
         return (!negate && totalAmount > 0) || (negate && totalAmount == 0);
     }
 
+    /**
+     * Проверяет активность пользователя по его ID и аргументам.
+     *
+     * @param userId   UUID пользователя.
+     * @param arguments список аргументов (например, название продукта).
+     * @param negate   флаг отрицания условия.
+     * @return true, если условие выполнено; иначе false.
+     */
     public boolean activeUserOfCheck(UUID userId, List<String> arguments, boolean negate) {
         int transactionCount = recommendationsRepository.getCountTransactionsByProductName(userId, arguments.get(0));
         return (!negate && transactionCount >= 5) || (negate && transactionCount == 0);
     }
+
+    /**
+     * Сравнивает сумму транзакций по депозитам и снятиям с заданным значением и условием сравнения.
+     *
+     * @param arguments   список аргументов (например, название продукта и знак сравнения).
+     * @param negate      флаг отрицания условия.
+     * @param depositMap  Map с поступлениями.
+     * @param withdrawMap Map со снятиями.
+     * @return true, если условие выполнено; иначе false.
+     */
 
     public boolean transactionSumCompareCheck(List<String> arguments, boolean negate,
                                               Map<String, Integer> depositMap, Map<String, Integer> withdrawMap) {
@@ -147,6 +202,15 @@ public class RecommendationSetOfRules {
         };
     }
 
+    /**
+     * Сравнивает суммы депозитов и снятий для конкретного продукта по заданному условию сравнения.
+     *
+     * @param arguments   список аргументов (например, название продукта и знак сравнения).
+     * @param negate      флаг отрицания условия.
+     * @param depositMap  Map с поступлениями.
+     * @param withdrawMap Map со снятиями.
+     * @return true, если условие выполнено; иначе false.
+     */
     public boolean compareTransactionsByProduct(List<String> arguments, boolean negate,
                                                 Map<String, Integer> depositMap, Map<String, Integer> withdrawMap) {
         String productType = arguments.get(0);
