@@ -7,6 +7,7 @@ import org.skypro.recommendationService.model.User;
 import org.skypro.recommendationService.model.WithdrawTransaction;
 import org.skypro.recommendationService.repository.RecommendationsRepository;
 import org.skypro.recommendationService.rules.RecommendationRuleSet;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -22,6 +23,7 @@ public class RecommendationService {
 
     private RecommendationSetOfRules recommendationSetOfRules;
 
+    @Autowired
     private final RecommendationsRepository recommendationsRepository;
 
     public RecommendationService(List<RecommendationRuleSet> ruleSets, RecommendationsRepository recommendationsRepository) {
