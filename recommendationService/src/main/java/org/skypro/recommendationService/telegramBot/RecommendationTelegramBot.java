@@ -1,15 +1,12 @@
 package org.skypro.recommendationService.telegramBot;
 
 import org.skypro.recommendationService.dto.RecommendationDto;
-import org.skypro.recommendationService.model.User;
 import org.skypro.recommendationService.service.RecommendationService;
-import org.skypro.recommendationService.service.UserService;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import org.telegram.telegrambots.meta.generics.TelegramBot;
 
 import java.util.List;
 import java.util.UUID;
@@ -113,7 +110,7 @@ public class RecommendationTelegramBot extends TelegramLongPollingBot {
      * @param chatId идентификатор чата.
      * @param text текст сообщения.
      */
-    private void sendMessage(Long chatId, String text) {
+    protected void sendMessage(Long chatId, String text) {
         SendMessage message = new SendMessage();
         message.setChatId(chatId.toString());
         message.setText(text);
