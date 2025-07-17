@@ -1,4 +1,6 @@
-package org.skypro.recommendationService.dto;
+package org.skypro.recommendationService.model;
+
+import org.skypro.recommendationService.dto.RecommendationDto;
 
 import java.util.List;
 import java.util.UUID;
