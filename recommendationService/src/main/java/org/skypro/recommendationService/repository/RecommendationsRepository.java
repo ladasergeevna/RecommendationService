@@ -9,14 +9,32 @@ import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
+/**
+ * Репозиторий для проверки условий рекомендаций на основе данных из базы.
+ * Использует JdbcTemplate для выполнения сложных SQL-запросов.
+ */
 @Component
 public class RecommendationsRepository {
     private final JdbcTemplate jdbcTemplate;
 
+    /**
+     * Инициализация с использованием кастомного JdbcTemplate.
+     *
+     * @param jdbcTemplate JdbcTemplate, настроенный на базу рекомендаций
+     */
     public RecommendationsRepository(@Qualifier("recommendationsJdbcTemplate") JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    /**
+     * Проверяет условия для правила A:
+     * - Пользователь использует дебетовые продукты
+     * - Не использует инвестиционные продукты
+     * - Имеет накопления более 1000 по сберегательным счетам
+     *
+     * @param userId идентификатор пользователя
+     * @return true, если все условия выполнены
+     */
     public boolean checkUserConditionsA(UUID userId) {
         String sql = "SELECT COUNT(*) FROM (" +
                 "SELECT DISTINCT u.id " +
@@ -36,6 +54,15 @@ public class RecommendationsRepository {
         return count != null && count > 0;
     }
 
+    /**
+     * Проверяет условия для правила B:
+     * - Пользователь использует дебетовые продукты
+     * - Сумма снятий по дебетовым или сберегательным продуктам превышает 50 000
+     * - Сумма депозитов превышает сумму снятий
+     *
+     * @param userId идентификатор пользователя
+     * @return true, если условия выполнены
+     */
     public boolean checkUserConditionsB(UUID userId) {
         String sql =
                 "SELECT COUNT(*) FROM users u " +
@@ -62,7 +89,15 @@ public class RecommendationsRepository {
         return count != null && count > 0;
     }
 
-
+    /**
+     * Проверяет условия для правила C:
+     * - Пользователь не использует кредитные продукты
+     * - Имеет положительное сальдо между депозитами и снятиями по дебетовым продуктам
+     * - Снял более 100 000 по дебетовым продуктам
+     *
+     * @param userId идентификатор пользователя
+     * @return true, если все условия выполнены
+     */
 public boolean checkUserConditionsC(UUID userId) {
     String sql =
             "SELECT COUNT(*) FROM ( " +

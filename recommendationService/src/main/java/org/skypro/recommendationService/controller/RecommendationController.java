@@ -4,11 +4,14 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.skypro.recommendationService.dto.RecommendationDto;
+
 import org.skypro.recommendationService.model.DepositTransactions;
 import org.skypro.recommendationService.model.RecommendationResponse;
 import org.skypro.recommendationService.model.User;
 import org.skypro.recommendationService.model.WithdrawTransaction;
+
 import org.skypro.recommendationService.service.RecommendationService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,6 +30,8 @@ import java.util.UUID;
 public class RecommendationController {
 
     private final RecommendationService recommendationService;
+    @Autowired
+    RecommendationResponse recommendationResponse;
 
     public RecommendationController(RecommendationService recommendationService) {
         this.recommendationService = recommendationService;
