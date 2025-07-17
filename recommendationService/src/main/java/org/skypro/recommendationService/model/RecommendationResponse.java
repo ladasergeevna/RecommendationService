@@ -9,6 +9,7 @@ import java.util.UUID;
  * DTO-класс для ответа API с рекомендациями пользователя.
  * Содержит идентификатор пользователя и список рекомендаций.
  */
+
 public class RecommendationResponse {
     private UUID userId;
     private List<RecommendationDto> recommendations;

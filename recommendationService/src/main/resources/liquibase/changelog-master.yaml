@@ -1,0 +1,21 @@
+databaseChangeLog:
+  - include:
+      file: liquibase/scripts/createProductsTable.sql
+
+  - include:
+      file: liquibase/scripts/createRecommendationTable.sql
+
+  - include:
+      file: liquibase/scripts/createRulesTable.sql
+
+  - include:
+      file: liquibase/scripts/createRuleArgumentsTable.sql
+
+  - include:
+      file: liquibase/scripts/createUsersTable.sql
+
+  - include:
+      file: liquibase/scripts/populateTransactions.sql
+
+  - include:
+      file: liquibase/scripts/userTables.sql

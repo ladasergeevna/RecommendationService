@@ -1,7 +1,9 @@
 package org.skypro.recommendationService.repository;
 
+import org.skypro.recommendationService.model.DepositTransactions;
+import org.skypro.recommendationService.model.WithdrawTransaction;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
@@ -123,5 +125,66 @@ public boolean checkUserConditionsC(UUID userId) {
     Integer count = jdbcTemplate.queryForObject(sql, Integer.class, userId);
     return count != null && count > 0;
 }
+
+    public int getCountTransactionsByProductName(UUID userId, String product){
+        String script = "SELECT COUNT(t.product_id) " +
+                "FROM transactions t " +
+                "JOIN products p ON t.product_id = p.id " +
+                "WHERE t.user_id = ? AND p.type = ?";
+
+        Integer count = jdbcTemplate.queryForObject(script, new Object[]{userId, product}, Integer.class);
+
+        return count;
+    }
+
+    @Cacheable(cacheNames = {"depositAmount"},  key = "{#userId}")
+    public DepositTransactions getDepositAmountByUserId(UUID userId) {
+
+        String script = "SELECT " +
+                "SUM(CASE WHEN p.type = 'DEBIT' AND t.type = 'DEPOSIT' THEN t.amount ELSE 0 END) AS debit_amount, " +
+                "SUM(CASE WHEN p.type = 'SAVING' AND t.type = 'DEPOSIT' THEN t.amount ELSE 0 END) AS saving_amount, " +
+                "SUM(CASE WHEN p.type = 'CREDIT' AND t.type = 'DEPOSIT' THEN t.amount ELSE 0 END) AS credit_amount, " +
+                "SUM(CASE WHEN p.type = 'INVEST' AND t.type = 'DEPOSIT' THEN t.amount ELSE 0 END) AS invest_amount " +
+                "FROM transactions t " +
+                "JOIN products p ON t.product_id = p.id " +
+                "WHERE t.user_id = ?";
+
+        DepositTransactions depositTransactions = jdbcTemplate.queryForObject(script, (rs, rowNum) ->
+                        new DepositTransactions(
+                                rs.getInt("debit_amount"),
+                                rs.getInt("saving_amount"),
+                                rs.getInt("credit_amount"),
+                                rs.getInt("invest_amount")),
+                userId);
+        return depositTransactions;
+    }
+
+    @Cacheable(cacheNames = {"withdrawAmount"},  key = "{#userId}")
+    public WithdrawTransaction getWithdrawAmountByUserId(UUID userId) {
+        String script = "SELECT " +
+                "SUM(CASE WHEN p.type = 'DEBIT' AND t.type = 'WITHDRAW' THEN t.amount ELSE 0 END) AS debit_amount, " +
+                "SUM(CASE WHEN p.type = 'SAVING' AND t.type = 'WITHDRAW' THEN t.amount ELSE 0 END) AS saving_amount, " +
+                "SUM(CASE WHEN p.type = 'CREDIT' AND t.type = 'WITHDRAW' THEN t.amount ELSE 0 END) AS credit_amount, " +
+                "SUM(CASE WHEN p.type = 'INVEST' AND t.type = 'WITHDRAW' THEN t.amount ELSE 0 END) AS invest_amount " +
+                "FROM transactions t " +
+                "JOIN products p ON t.product_id = p.id " +
+                "WHERE t.user_id = ?";
+        WithdrawTransaction withdrawTransaction = jdbcTemplate.queryForObject(script, (rs, rowNum) ->
+                        new WithdrawTransaction(
+                                rs.getInt("debit_amount"),
+                                rs.getInt("saving_amount"),
+                                rs.getInt("credit_amount"),
+                                rs.getInt("invest_amount")),
+                userId);
+        return withdrawTransaction;
+    }
+
+    public int getRandomTransactionAmount(UUID user) {
+        Integer result = jdbcTemplate.queryForObject(
+                "SELECT amount FROM transactions t WHERE t.user_id = ? LIMIT 1",
+                Integer.class,
+                user);
+        return result != null ? result : 0;
+    }
 
 }
